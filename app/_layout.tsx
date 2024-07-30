@@ -1,37 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { backendHead } from "@/constants/Others";
+import axios from "axios";
+import { Link, Slot, usePathname } from "expo-router";
+import { StatusBar, Text, View } from "react-native";
+import Constants from 'expo-constants';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+axios.defaults.baseURL = backendHead;
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
+export default function MainLayout() {
+  const currentRoute = usePathname();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+    <>
+      <StatusBar />
+      <View style={{
+        height: Constants.statusBarHeight,
+        backgroundColor: 'lightgreen'
+      }}></View>
+      {currentRoute !== '/' &&
+        <Link href='/' style={{
+          margin: 20,
+          backgroundColor: 'lightgrey',
+          width: '30%',
+          padding: 10
+        }}>{`<<< BACK <<<`}</Link>
+      }
+      <Slot />
+    </>
+  )
 }
