@@ -16,7 +16,6 @@ export default function TestInfiniteScroll() {
   const getSomeJokes = useCallback(async (_page: number) => {
     axios.get(`api/Joke?PageSize=${limit}&PageNumber=${_page}`)
       .then(res => {
-        console.log('success', JSON.stringify(res.data))
         setJokes(prev => prev.concat(res.data))
       })
       .catch(err => console.log('ERR get some jokes:', JSON.stringify(err)))

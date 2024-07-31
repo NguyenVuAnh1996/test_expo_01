@@ -1,4 +1,4 @@
-export const backendHead = 'http://192.168.1.16:5199/';
+export const backendHead = 'http://192.168.1.233:5199/';
 
 export interface LinkItem {
   id: number,
