@@ -3,17 +3,23 @@ import { ResizeMode, Video } from "expo-av";
 import { CameraType, CameraView, useCameraPermissions, useMicrophonePermissions } from "expo-camera";
 import * as FileSystem from 'expo-file-system';
 import { useRef, useState } from "react";
-import { Button, Dimensions, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, Dimensions, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FormData from "form-data";
 import { backendHead } from "@/constants/Others";
 import { VidCompressor } from "@/no_expogo/VidCompressor";
+import { getFileTypeFromUri } from "@/lib/utils";
+import * as VideoThumbnails from 'expo-video-thumbnails';
 
 interface ClipEntity {
   id: number
   url: string
 }
 
-const clipFileType = 'mp4';
+interface ClipItem extends ClipEntity {
+  thumbUri: string
+}
+
+const clipFileTypes = ['mp4', 'mov'];
 
 const convertNowToFilename = () => {
   const now = new Date();
@@ -31,7 +37,23 @@ const convertNowToFilename = () => {
     padZero(now.getHours()),
     padZero(now.getMinutes()),
     padZero(now.getSeconds()),
-  ].join('_') + '.' + clipFileType;
+  ].join('_');
+}
+
+const compressVideo = async (uriBefore: string): Promise<string> => {
+  console.log('file type before: ', getFileTypeFromUri(uriBefore));
+  const fileInfo: any = await FileSystem.getInfoAsync(uriBefore, {
+    size: true
+  });
+  console.log('file size before:', fileInfo.size.toLocaleString());
+
+  const result = await VidCompressor.compress(uriBefore);
+  console.log('file type after: ', result.substring(result.lastIndexOf(".")));
+  const fileInfoAfter: any = await FileSystem.getInfoAsync(result, {
+    size: true
+  });
+  console.log('file size after:', fileInfoAfter.size.toLocaleString());
+  return result;
 }
 
 const screenWidth = Dimensions.get("window").width;
@@ -46,7 +68,7 @@ export default function TestCameraVideo() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
   const videoRef = useRef<Video>(null);
-  const [videos, setVideos] = useState<ClipEntity[]>([]);
+  const [videos, setVideos] = useState<ClipItem[]>([]);
   const [videoListModalOpen, setVideoListModalOpen] = useState<boolean>(false);
 
   if (!cameraPermission || !microphonePermission) {
@@ -81,23 +103,16 @@ export default function TestCameraVideo() {
   const startRecording = async () => {
     setIsRecording(true);
     if (!isCameraReady) return;
-    const video = await cameraRef.current?.recordAsync();
-    setIsRecording(false);
-    if (video) {
-      const uriBefore = video.uri;
-      console.log('file type before: ', uriBefore.substring(uriBefore.lastIndexOf(".")));
-      const fileInfo: any = await FileSystem.getInfoAsync(video.uri, {
-        size: true
-      });
-      console.log('file size before:', fileInfo.size.toLocaleString());
-
-      const result = await VidCompressor.compress(uriBefore);
-      console.log('file type after: ', result.substring(result.lastIndexOf(".")));
-      const fileInfoAfter: any = await FileSystem.getInfoAsync(result, {
-        size: true
-      });
-      console.log('file size after:', fileInfoAfter.size.toLocaleString());
-      setVideoUri(result);
+    try {
+      const video = await cameraRef.current?.recordAsync();
+      if (video) {
+        let result = await compressVideo(video.uri);
+        setVideoUri(result);
+      }
+      setIsRecording(false);
+    } catch (err) {
+      console.log('ERROR:', err);
+      setIsRecording(false);
     }
   }
 
@@ -108,14 +123,15 @@ export default function TestCameraVideo() {
   const handleUpload = async () => {
     if (videoUri === '') return;
     let formData = new FormData();
+    let _fileType = getFileTypeFromUri(videoUri);
     formData.append('file', {
-      name: convertNowToFilename(),
-      type: `video/${clipFileType}`,
+      name: convertNowToFilename() + _fileType,
+      type: `video/${_fileType.slice(1)}`,
       uri: videoUri
     })
     axios.post('api/Clip/upload', formData, {
       headers: {
-        'Accept': '*/*',
+        'Accept': clipFileTypes.map(x => `video/${x}`).join(','),
         'Content-Type': 'multipart/form-data'
       }
     })
@@ -133,11 +149,27 @@ export default function TestCameraVideo() {
       })
   }
 
+  const makeThumbnails = async (_clips: ClipEntity[]) => {
+    try {
+      let result: ClipItem[] = [];
+      for (const x of _clips) {
+        const { uri } = await VideoThumbnails.getThumbnailAsync(backendHead + 'videos/' + x.url);
+        result.push({
+          ...x,
+          thumbUri: uri
+        })
+      }
+      setVideos(result);
+      setVideoListModalOpen(true);
+    } catch (err) {
+      console.log('ERR:', err);
+    }
+  }
+
   const getAllVideos = () => {
     axios.get('api/Clip/')
       .then(res => {
-        setVideos(res.data);
-        setVideoListModalOpen(true);
+        makeThumbnails(res.data);
       })
       .catch(err => {
         if (err.response) {
@@ -222,7 +254,7 @@ const VideosListModal = ({
   modelOpen,
   setModalOpen
 }: {
-  videos: ClipEntity[]
+  videos: ClipItem[]
   modelOpen: boolean
   setModalOpen: (input: boolean) => void
 }) => {
@@ -265,12 +297,24 @@ const VideosListModal = ({
                 width: '100%',
                 padding: 20,
                 backgroundColor: 'white',
-                marginBottom: 20
+                marginBottom: 20,
+                flexDirection: 'row',
+                justifyContent: 'space-between'
               }} onPress={() => {
                 setVideoUrl(x.url);
                 setVideoModalOpen(true);
               }}>
                 <Text>{x.url}</Text>
+                <Image
+                  source={{
+                    uri: x.thumbUri
+                  }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    objectFit: 'cover'
+                  }}
+                />
               </Pressable>
             )}
           </View>

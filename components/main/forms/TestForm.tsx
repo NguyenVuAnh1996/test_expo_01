@@ -9,6 +9,7 @@ import SelectMultiRHF from "./SelectMultiRHF";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import DateTimePickerLib01RHF from "./DateTimePickerLib01RHF";
 import DateTimePickerLib02RHF from "./DateTimePickerLib02RHF";
+import DateTimePickerLib_11_RHF from "./DateTimePickerLib_11_RHF";
 
 interface Inputs {
   fullname: string
@@ -123,19 +124,8 @@ export default function TestForm() {
         control={control}
         errors={errors}
         name="birthday"
-        mode="date"
+        mode="time"
       />
-      {/* <DateTimePickerLib02RHF
-        control={control}
-        errors={errors}
-        name="birthday"
-        timePicker
-      /> */}
-      {/* <DateTimePickerLib03RHF
-        control={control}
-        errors={errors}
-        name="birthday"
-      /> */}
       <Button
         title="Submit"
         onPress={handleSubmit(onSubmit)}

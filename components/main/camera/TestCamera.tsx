@@ -5,8 +5,9 @@ import { Button, Dimensions, Image, Modal, Pressable, StyleSheet, Text, Touchabl
 import * as ImagePicker from 'expo-image-picker';
 import FormData from "form-data";
 import { backendHead } from '@/constants/Others';
+import { getFileTypeFromUri } from '@/lib/utils';
 
-const imageFileType = 'png';
+const imageFileTypes = ['png', 'jpg', 'jpeg', 'heic'];
 
 interface ImageEntity {
   id: number
@@ -29,7 +30,7 @@ const convertNowToFilename = () => {
     padZero(now.getHours()),
     padZero(now.getMinutes()),
     padZero(now.getSeconds()),
-  ].join('_') + '.' + imageFileType;
+  ].join('_');
 }
 
 const screenWidth = Dimensions.get("window").width;
@@ -66,7 +67,7 @@ export default function TestCamera() {
   const takePic = async () => {
     if (!isCameraReady) return;
     const picture = await ref.current?.takePictureAsync({
-      imageType: imageFileType
+      // imageType: 'png'
     });
     if (picture) {
       let str = picture.uri;
@@ -92,14 +93,15 @@ export default function TestCamera() {
   const handleUploadImage = async () => {
     if (imgUri === '') return;
     let formData = new FormData();
+    let _fileType = getFileTypeFromUri(imgUri);
     formData.append('file', {
-      name: convertNowToFilename(),
-      type: `image/${imageFileType}`,
+      name: convertNowToFilename() + _fileType,
+      type: `image/${_fileType.slice(1)}`,
       uri: imgUri
     })
     axios.post('api/Image/upload', formData, {
       headers: {
-        'Accept': '*/*',
+        'Accept': imageFileTypes.map(x => `image/${x}`).join(','),
         'Content-Type': 'multipart/form-data'
       }
     })

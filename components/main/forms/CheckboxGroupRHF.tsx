@@ -45,6 +45,7 @@ const CheckboxGroup = ({
           onPress={() => handleChange(x.value)}
           style={{
             flexDirection: 'row',
+            padding: 5
           }}
         >
           <View style={[

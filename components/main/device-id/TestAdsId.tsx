@@ -1,39 +1,53 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAdvertisingId, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
+import * as Application from 'expo-application';
+
+const isAndroid = Platform.OS === 'android';
+const isIOS = Platform.OS === 'ios';
 
 export default function TestAdsId() {
-  const [adsId, setAdsId] = useState<string>('');
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const [adsId, setAdsId] = useState<string>('Waiting: ...');
+  const [deviceId, setDeviceId] = useState<string>('Waiting: ...');
 
-  const getDeviceId = useCallback(async () => {
+  const getAdsId = useCallback(async () => {
     const { granted } = await requestTrackingPermissionsAsync();
     if (granted) {
       let id = getAdvertisingId();
       if (id) {
         setAdsId(id);
       } else {
-        setErrorMsg('Id not found!');
+        setAdsId('Id not found!');
       }
     } else {
-      setErrorMsg('Permission denied!')
+      setAdsId('Permission denied!')
     }
   }, []);
 
-  useEffect(() => {
-    getDeviceId();
-  }, [getDeviceId])
+  const getDeviceId = useCallback(async () => {
+    let id = '';
+    try {
+      if (isAndroid) {
+        id = Application.getAndroidId();
+      } else if (isIOS) {
+        let _id = await Application.getIosIdForVendorAsync();
+        if (_id) id = _id;
+      }
+      setDeviceId(id);
+    } catch (err) {
+      setDeviceId('Cannot get device ID');
+    }
+  }, [])
 
-  let text = 'Waiting..';
-  if (errorMsg !== '') {
-    text = errorMsg;
-  } else if (adsId !== '') {
-    text = adsId;
-  }
+  useEffect(() => {
+    getAdsId();
+    getDeviceId();
+  }, [getAdsId, getDeviceId])
 
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>{text}</Text>
+      <Text style={styles.paragraph}>{`Ads ID: ${adsId}`}</Text>
+      <Text style={styles.paragraph}>{`Device ID: ${deviceId}`}</Text>
     </View>
   )
 }
@@ -48,5 +62,6 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 18,
     textAlign: 'center',
+    marginBottom: 20
   },
 });
