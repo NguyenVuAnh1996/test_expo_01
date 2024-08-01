@@ -51,11 +51,9 @@ const DateTimePickerLib01 = ({
   }
 
   const handleDatePickerChange = (event: DateTimePickerEvent, date: Date | undefined) => {
-    if (isIOS) {
-      handleCloseIOSModal();
-    } else {
+    if (isAndroid) {
       setDateModalOpen(false);
-    }
+    } 
     if (event.type === 'set') {
       setInputDate(date ? date : new Date());
       onChange(date ? date : new Date());

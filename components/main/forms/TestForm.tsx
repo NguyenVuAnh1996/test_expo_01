@@ -124,7 +124,7 @@ export default function TestForm() {
         control={control}
         errors={errors}
         name="birthday"
-        mode="time"
+        mode="date"
       />
       <Button
         title="Submit"
