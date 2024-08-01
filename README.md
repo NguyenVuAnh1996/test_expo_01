@@ -6,6 +6,8 @@ I have created some customed components (in the ***components/main folder***) so
 
 Note that I have not tested these component with an IOS build, as I only tested them on Expo Go.
 
+Regarding the datetimepicker components, the ***DateTimePickerLib01RHF*** is the most functional one.
+
 Instead of default expo-router that uses file-based routing, I use react-navigation/native for routing. If you want to do the same as me:
 
 - in package.json file: change "main":"expo-router/entry" to ***"main":"node_modules/expo/AppEntry.js"***
