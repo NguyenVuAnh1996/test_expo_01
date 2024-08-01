@@ -2,13 +2,14 @@ import axios from "axios";
 import { ResizeMode, Video } from "expo-av";
 import { CameraType, CameraView, useCameraPermissions, useMicrophonePermissions } from "expo-camera";
 import * as FileSystem from 'expo-file-system';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Dimensions, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FormData from "form-data";
-import { backendHead } from "@/constants/Others";
-import { VidCompressor } from "@/no_expogo/VidCompressor";
+import { VidCompressor } from "@/no_expo_go/VidCompressor";
 import { getFileTypeFromUri } from "@/lib/utils";
 import * as VideoThumbnails from 'expo-video-thumbnails';
+import { backendHead } from "@/constants/Others";
+import { useTryCatchPending } from "@/hooks/useTryCatchPending";
 
 interface ClipEntity {
   id: number
@@ -65,7 +66,9 @@ export default function TestCameraVideo() {
   const [videoUri, setVideoUri] = useState<string>('');
   const cameraRef = useRef<CameraView>(null);
   const [isCameraReady, setCameraReady] = useState<boolean>(false);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isRecording, executeRecording] = useTryCatchPending();
+  const [isUploading, startUploading] = useTryCatchPending();
+  const [isGettingList, startGettingList] = useTryCatchPending();
 
   const videoRef = useRef<Video>(null);
   const [videos, setVideos] = useState<ClipItem[]>([]);
@@ -96,24 +99,24 @@ export default function TestCameraVideo() {
     );
   }
 
-  const toggleCameraFacing = () => {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  const toggleCameraFacing = async () => {
+    await setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
   const startRecording = async () => {
-    setIsRecording(true);
     if (!isCameraReady) return;
-    try {
-      const video = await cameraRef.current?.recordAsync();
-      if (video) {
-        let result = await compressVideo(video.uri);
-        setVideoUri(result);
-      }
-      setIsRecording(false);
-    } catch (err) {
-      console.log('ERROR:', err);
-      setIsRecording(false);
-    }
+    executeRecording(
+      async () => {
+        console.log('started recording')
+        const video = await cameraRef.current?.recordAsync();
+        console.log('stopped recording')
+        if (video) {
+          let result = await compressVideo(video.uri);
+          setVideoUri(result);
+        }
+      },
+      err => console.log('ERROR:', err),
+    )
   }
 
   const stopRecording = () => {
@@ -122,31 +125,34 @@ export default function TestCameraVideo() {
 
   const handleUpload = async () => {
     if (videoUri === '') return;
-    let formData = new FormData();
-    let _fileType = getFileTypeFromUri(videoUri);
-    formData.append('file', {
-      name: convertNowToFilename() + _fileType,
-      type: `video/${_fileType.slice(1)}`,
-      uri: videoUri
-    })
-    axios.post('api/Clip/upload', formData, {
-      headers: {
-        'Accept': clipFileTypes.map(x => `video/${x}`).join(','),
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-      .then(res => {
+
+    startUploading(
+      async () => {
+        let formData = new FormData();
+        let _fileType = getFileTypeFromUri(videoUri);
+        formData.append('file', {
+          name: convertNowToFilename() + _fileType,
+          type: `video/${_fileType.slice(1)}`,
+          uri: videoUri
+        })
+        await axios.post('api/Clip/upload', formData, {
+          headers: {
+            'Accept': clipFileTypes.map(x => `video/${x}`).join(','),
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         console.log('success');
         setVideoUri('');
-      })
-      .catch(err => {
+      },
+      err => {
         if (err.response) {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         } else {
           console.log('there is no error response')
         }
-      })
+      }
+    )
   }
 
   const makeThumbnails = async (_clips: ClipEntity[]) => {
@@ -167,16 +173,18 @@ export default function TestCameraVideo() {
   }
 
   const getAllVideos = () => {
-    axios.get('api/Clip/')
-      .then(res => {
+    startGettingList(
+      async () => {
+        let res = await axios.get('api/Clip/');
         makeThumbnails(res.data);
-      })
-      .catch(err => {
+      },
+      err => {
         if (err.response) {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         }
-      })
+      }
+    )
   }
 
   return (
@@ -195,12 +203,14 @@ export default function TestCameraVideo() {
             onPress={startRecording}
             disabled={isRecording}
           >
-            <Text style={styles.text}>Start</Text>
+            <Text style={[
+              styles.text,
+              { color: isRecording ? 'purple' : 'white' }
+            ]}>Start</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
             onPress={stopRecording}
-            disabled={!isRecording}
           >
             <Text style={styles.text}>Stop</Text>
           </TouchableOpacity>
@@ -233,10 +243,10 @@ export default function TestCameraVideo() {
         gap: 10,
         padding: 20
       }}>
-        <Pressable style={styles.uploadBtn} onPress={handleUpload}>
+        <Pressable disabled={isUploading} style={styles.uploadBtn} onPress={handleUpload}>
           <Text>Upload</Text>
         </Pressable>
-        <Pressable style={styles.showVideoListBtn} onPress={getAllVideos}>
+        <Pressable disabled={isGettingList} style={styles.showVideoListBtn} onPress={getAllVideos}>
           <Text>Video list</Text>
         </Pressable>
       </View>

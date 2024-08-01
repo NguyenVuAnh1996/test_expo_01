@@ -1,11 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { CameraView, CameraType, useCameraPermissions, Camera } from 'expo-camera';
 import { useRef, useState } from 'react';
 import { Button, Dimensions, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import FormData from "form-data";
-import { backendHead } from '@/constants/Others';
 import { getFileTypeFromUri } from '@/lib/utils';
+import { backendHead } from '@/constants/Others';
+import { useTryCatchPending } from '@/hooks/useTryCatchPending';
 
 const imageFileTypes = ['png', 'jpg', 'jpeg', 'heic'];
 
@@ -40,6 +41,9 @@ export default function TestCamera() {
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef<CameraView>(null);
   const [isCameraReady, setCameraReady] = useState<boolean>(false);
+  const [isTakingPic, startTakingPic] = useTryCatchPending();
+  const [isUploading, startUploading] = useTryCatchPending();
+  const [isGettingList, startGettingList] = useTryCatchPending();
   const [imgUri, setImgUri] = useState<string>('');
   const [images, setImages] = useState<ImageEntity[]>([]);
   const [imageListModalOpen, setImageListModalOpen] = useState<boolean>(false);
@@ -65,16 +69,19 @@ export default function TestCamera() {
   }
 
   const takePic = async () => {
-    if (!isCameraReady) return;
-    const picture = await ref.current?.takePictureAsync({
-      // imageType: 'png'
-    });
-    if (picture) {
-      let str = picture.uri;
-      let fileType = str.substring(str.lastIndexOf("."));
-      console.log('file type: ', fileType);
-      setImgUri(str);
-    }
+    if (!isCameraReady || isTakingPic) return;
+    startTakingPic(
+      async () => {
+        const picture = await ref.current?.takePictureAsync();
+        if (picture) {
+          let str = picture.uri;
+          let fileType = str.substring(str.lastIndexOf("."));
+          console.log('file type: ', fileType);
+          setImgUri(str);
+        }
+      },
+      err => console.log('error when taking pic')
+    )
   }
 
   const pickImage = async () => {
@@ -92,46 +99,49 @@ export default function TestCamera() {
 
   const handleUploadImage = async () => {
     if (imgUri === '') return;
-    let formData = new FormData();
-    let _fileType = getFileTypeFromUri(imgUri);
-    formData.append('file', {
-      name: convertNowToFilename() + _fileType,
-      type: `image/${_fileType.slice(1)}`,
-      uri: imgUri
-    })
-    axios.post('api/Image/upload', formData, {
-      headers: {
-        'Accept': imageFileTypes.map(x => `image/${x}`).join(','),
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-      .then(res => {
+    startUploading(
+      async () => {
+        let formData = new FormData();
+        let _fileType = getFileTypeFromUri(imgUri);
+        formData.append('file', {
+          name: convertNowToFilename() + _fileType,
+          type: `image/${_fileType.slice(1)}`,
+          uri: imgUri
+        })
+        await axios.post('api/Image/upload', formData, {
+          headers: {
+            'Accept': imageFileTypes.map(x => `image/${x}`).join(','),
+            'Content-Type': 'multipart/form-data'
+          }
+        });
         console.log('success');
         setImgUri('');
-      })
-      .catch(err => {
-        console.log('ERROR:: ', JSON.stringify(err))
+      },
+      err => {
         if (err.response) {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         } else {
           console.log('there is no error response')
         }
-      })
+      }
+    )
   }
 
-  const getAllImages = () => {
-    axios.get('api/Image/')
-      .then(res => {
-        setImages(res.data);
+  const getAllImages = async () => {
+    startGettingList(
+      async () => {
+        const result = await axios.get('api/Image/');
+        setImages(result.data);
         setImageListModalOpen(true);
-      })
-      .catch(err => {
+      },
+      err => {
         if (err.response) {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         }
-      })
+      }
+    )
   }
 
   return (
@@ -178,10 +188,13 @@ export default function TestCamera() {
         <Pressable style={styles.pickerBtn} onPress={pickImage}>
           <Text>Chọn từ thư mục</Text>
         </Pressable>
-        <Pressable style={styles.uploadBtn} onPress={handleUploadImage}>
+        <Pressable disabled={isUploading} style={styles.uploadBtn} onPress={handleUploadImage}>
           <Text>Upload</Text>
         </Pressable>
-        <Pressable style={styles.showImgListBtn} onPress={getAllImages}>
+        <Pressable disabled={isGettingList} style={[
+          styles.showImgListBtn,
+          { opacity: isGettingList ? 0.7 : 1 }
+        ]} onPress={getAllImages}>
           <Text>Image list</Text>
         </Pressable>
       </View>

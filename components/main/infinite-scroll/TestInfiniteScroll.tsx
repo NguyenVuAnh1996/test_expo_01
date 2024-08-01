@@ -12,11 +12,17 @@ const limit = 4;
 export default function TestInfiniteScroll() {
   const [jokes, setJokes] = useState<JokeEntity[]>([]);
   const [page, setPage] = useState<number>(2);
+  const [noMoreData, setNoMoreData] = useState<boolean>(false);
 
   const getSomeJokes = useCallback(async (_page: number) => {
     axios.get(`api/Joke?PageSize=${limit}&PageNumber=${_page}`)
       .then(res => {
-        setJokes(prev => prev.concat(res.data))
+        let _newData: JokeEntity[] = res.data;
+        if (_newData.length > 0) {
+          setJokes(prev => prev.concat(_newData))
+        } else {
+          setNoMoreData(true);
+        }
       })
       .catch(err => console.log('ERR get some jokes:', JSON.stringify(err)))
   }, [])
@@ -43,20 +49,35 @@ export default function TestInfiniteScroll() {
     </View>, [])
 
   const handleReachEndScreen = () => {
-    getSomeJokes(page);
-    setPage(prev => prev + 1);
+    if (!noMoreData) {
+      getSomeJokes(page);
+      setPage(prev => prev + 1);
+    }
   }
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={{ width: '100%' }}>
       <FlatList
         data={jokes}
         renderItem={renderItem}
         onEndReached={handleReachEndScreen}
-        // onEndReachedThreshold={0.8}
-        style={{flex: 1}}
+        onEndReachedThreshold={1}
+        style={{
+          width: '100%',
+          padding: 10
+        }}
         // keyExtractor={item => String(item.id)}
       />
+      {!noMoreData && 
+      <View style={{ 
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20
+       }}>
+        <Text>Đang tải ...</Text>
+      </View>
+      }
     </View>
   )
 }

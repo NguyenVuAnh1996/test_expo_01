@@ -1,12 +1,13 @@
 import { Pressable, ScrollView, Text } from "react-native"
 import screens from "./screens"
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 const NavBtn = ({ 
   navigation,
   screenName,
   displayName
  }: {
-  navigation: any,
+  navigation: NativeStackNavigationProp<any, string, undefined>,
   screenName: string,
   displayName: string
 }) => (
@@ -25,12 +26,10 @@ const NavBtn = ({
   </Pressable>
 )
 
-export default function HomeScreen({ navigation }: {
-  navigation: any
-}) {
+export default function HomeScreen({ navigation }: NativeStackScreenProps<any>) {
   return (
     <ScrollView style={{ flex: 1, padding: 10 }}>
-      {screens.reverse().map(x => 
+      {screens.toReversed().map(x => 
         <NavBtn 
           key={x.details.link}
           screenName={x.details.link}

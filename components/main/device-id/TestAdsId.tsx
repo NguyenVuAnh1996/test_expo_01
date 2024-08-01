@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getAdvertisingId, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { Platform, StyleSheet, Text, View } from "react-native";
 import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 
 const isAndroid = Platform.OS === 'android';
 const isIOS = Platform.OS === 'ios';
@@ -31,6 +32,7 @@ export default function TestAdsId() {
         id = Application.getAndroidId();
       } else if (isIOS) {
         let _id = await Application.getIosIdForVendorAsync();
+        // let _id = Device.modelId;
         if (_id) id = _id;
       }
       setDeviceId(id);
