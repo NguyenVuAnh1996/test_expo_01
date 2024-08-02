@@ -73,6 +73,7 @@ export default function CrudeDatepicker({
 
   const handleChooseYear = (year: number) => {
     setCurrentYear(year);
+    setMode('month');
   }
 
   return (
@@ -112,7 +113,7 @@ export default function CrudeDatepicker({
               <Text style={styles.controlBtnText}>{'<<'}</Text>
             </Pressable>
             <Pressable style={styles.dateBtn} onPress={handleSwitchMode}>
-              <Text style={styles.dateBtnText}>{`${months[currentJsMonth].longName}, ${inputDate.getFullYear()}`}</Text>
+              <Text style={styles.dateBtnText}>{`${months[currentJsMonth].longName}, ${currentYear}`}</Text>
             </Pressable>
             <Pressable style={styles.controlbtn} onPress={handleNextBtn}>
               <Text style={styles.controlBtnText}>{'>>'}</Text>

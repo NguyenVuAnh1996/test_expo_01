@@ -30,7 +30,7 @@ export default function CrudeDatepickerRHF<T extends FieldValues>({
         rules={{ required: isRequired }}
         render={({ field }) =>
           <CrudeDatepicker 
-            current={field.value ? field.value : new Date()}
+            value={field.value}
             onChange={field.onChange}
           />
         }
