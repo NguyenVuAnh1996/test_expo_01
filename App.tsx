@@ -9,10 +9,13 @@ import { backendHead } from "./constants/Others";
 import CustomHeader from "./components/main/CustomHeader";
 import { Colors } from "./constants/Colors";
 import Constants from 'expo-constants';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 axios.defaults.baseURL = backendHead;
 
 const isIOS = Platform.OS === 'ios';
+
+const queryClient = new QueryClient()
 
 const Stack = createNativeStackNavigator();
 
@@ -27,27 +30,33 @@ export default function App() {
           backgroundColor: Colors.default.header
         }}></View>
       }
-      <SafeAreaView style={{ flex: 1 }}>
-        <Stack.Navigator
-          screenOptions={{
-            header: CustomHeader
-          }}
-        >
-          <Stack.Screen
-            name={routes.Home.link}
-            component={HomeScreen}
-            options={{ title: routes.Home.displayName }}
-          />
-          {screens.map(x =>
-            <Stack.Screen
-              key={x.details.link}
-              name={x.details.link}
-              component={x.component}
-              options={{ title: x.details.displayName }}
-            />
-          )}
-        </Stack.Navigator>
-      </SafeAreaView>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <RouteStacks />
+        </SafeAreaView>
+      </QueryClientProvider>
     </NavigationContainer>
   )
 }
+
+const RouteStacks = () => (
+  <Stack.Navigator
+    screenOptions={{
+      header: CustomHeader
+    }}
+  >
+    <Stack.Screen
+      name={routes.Home.link}
+      component={HomeScreen}
+      options={{ title: routes.Home.displayName }}
+    />
+    {screens.map(x =>
+      <Stack.Screen
+        key={x.details.link}
+        name={x.details.link}
+        component={x.component}
+        options={{ title: x.details.displayName }}
+      />
+    )}
+  </Stack.Navigator>
+)

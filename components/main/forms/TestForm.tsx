@@ -10,6 +10,7 @@ import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/d
 import DateTimePickerLib01RHF from "./DateTimePickerLib01RHF";
 import DateTimePickerLib02RHF from "./DateTimePickerLib02RHF";
 import DateTimePickerLib_11_RHF from "./DateTimePickerLib_11_RHF";
+import CrudeDatepickerRHF from "../datetime-calendar/CrudeDatepickerRHF";
 
 interface Inputs {
   fullname: string
@@ -120,11 +121,16 @@ export default function TestForm() {
           { label: 'Hủ tiếu', value: 8 },
         ]}
       />
-      <DateTimePickerLib01RHF 
+      {/* <DateTimePickerLib01RHF 
         control={control}
         errors={errors}
         name="birthday"
         mode="date"
+      /> */}
+      <CrudeDatepickerRHF 
+        control={control}
+        errors={errors}
+        name="birthday"
       />
       <Button
         title="Submit"

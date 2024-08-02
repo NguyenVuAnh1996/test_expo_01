@@ -7,6 +7,8 @@ import FormData from "form-data";
 import { getFileTypeFromUri } from '@/lib/utils';
 import { backendHead } from '@/constants/Others';
 import { useTryCatchPending } from '@/hooks/useTryCatchPending';
+import useQuerySimplified from '@/hooks/useQuerySimplified';
+import { useQuery } from '@tanstack/react-query';
 
 const imageFileTypes = ['png', 'jpg', 'jpeg', 'heic'];
 
@@ -43,26 +45,9 @@ export default function TestCamera() {
   const [isCameraReady, setCameraReady] = useState<boolean>(false);
   const [isTakingPic, startTakingPic] = useTryCatchPending();
   const [isUploading, startUploading] = useTryCatchPending();
-  const [isGettingList, startGettingList] = useTryCatchPending();
   const [imgUri, setImgUri] = useState<string>('');
   const [images, setImages] = useState<ImageEntity[]>([]);
   const [imageListModalOpen, setImageListModalOpen] = useState<boolean>(false);
-
-
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
 
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -128,20 +113,39 @@ export default function TestCamera() {
     )
   }
 
+  const tryGetAllImages = async () => {
+    const result = await axios.get('api/Image/');
+    setImages(result.data);
+    setImageListModalOpen(true);
+    return result.data;
+  }
+
+  const [isGettingList, startGettingList] = useQuerySimplified(tryGetAllImages, 'get-all-images');
+
   const getAllImages = async () => {
     startGettingList(
-      async () => {
-        const result = await axios.get('api/Image/');
-        setImages(result.data);
-        setImageListModalOpen(true);
-      },
-      err => {
+      (err: any) => {
         if (err.response) {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         }
       }
     )
+  }
+
+  if (!permission) {
+    // Camera permissions are still loading.
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet.
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
   }
 
   return (
@@ -195,7 +199,7 @@ export default function TestCamera() {
           styles.showImgListBtn,
           { opacity: isGettingList ? 0.7 : 1 }
         ]} onPress={getAllImages}>
-          <Text>Image list</Text>
+          <Text>{isGettingList ? 'getting...': 'Image list'}</Text>
         </Pressable>
       </View>
       <Modal

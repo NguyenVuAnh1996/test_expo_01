@@ -1,3 +1,4 @@
+import DateScreen from "./DateScreen"
 import DeviceIdScreen from "./DeviceIdScreen"
 import FormScreen from "./FormScreen"
 import InfiniteScrollScreen from "./InfiniteScrollScreen"
@@ -18,6 +19,7 @@ const screens: {
     { details: routes.TestDeviceId, component: DeviceIdScreen },
     { details: routes.TestLocalAuth, component: LocalAuthenScreen },
     { details: routes.InfiniteScroll, component: InfiniteScrollScreen },
+    { details: routes.TestDate, component: DateScreen },
   ];
 
 export default screens;
