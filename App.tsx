@@ -10,12 +10,15 @@ import CustomHeader from "./components/main/CustomHeader";
 import { Colors } from "./constants/Colors";
 import Constants from 'expo-constants';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import setUpRNCalendars from "./components/main/task-calendar/RNCalendarsConfig";
 
 axios.defaults.baseURL = backendHead;
 
 const isIOS = Platform.OS === 'ios';
 
 const queryClient = new QueryClient()
+
+setUpRNCalendars();
 
 const Stack = createNativeStackNavigator();
 
