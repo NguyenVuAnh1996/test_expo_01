@@ -14,5 +14,5 @@
     "index.d.ts",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "_app/_layout.tsx"  ]
+, "_app/_layout.tsx", "components/main/datetime-calendar-vuanh/lunarCalendar.js"  ]
 }

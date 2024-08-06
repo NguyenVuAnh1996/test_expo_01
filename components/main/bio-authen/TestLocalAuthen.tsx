@@ -32,7 +32,8 @@ export default function TestLocalAuthen() {
     setIsChecking(prev => true);
 
     let result = await LocalAuthentication.authenticateAsync({
-      biometricsSecurityLevel: 'strong'
+      biometricsSecurityLevel: 'strong',
+      disableDeviceFallback: true
     });
     setIsChecking(prev => false);
     if (result && result.success) {
@@ -67,7 +68,7 @@ export default function TestLocalAuthen() {
         padding: 10,
         backgroundColor: 'salmon',
         marginBottom: 20
-      }} disabled={isChecking} onPress={findAuthenTypes}>
+      }} disabled={isChecking} onPress={authen}>
         <Text>{isChecking ? 'Checking ...' : 'Test authen'}</Text>
       </Pressable>
       <Text>{text}</Text>
