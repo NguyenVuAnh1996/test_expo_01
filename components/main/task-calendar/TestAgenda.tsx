@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
-import { Agenda } from "react-native-calendars";
+// import { Agenda } from "react-native-calendars";
 import { daysOfWeek } from "./RNCalendarsConfig";
+import { Agenda } from "../react_native_calendars";
 
 interface TaskItemShown {
   name: string
@@ -23,10 +24,10 @@ export default function TestAgenda() {
     <View style={{ flex: 1 }} >
       <Agenda
         items={{
-          '2024-08-08': [{ name: 'research jquery' }],
-          '2024-08-07': [{ name: 'cleaning' }],
+          '2024-08-08': [{ name: 'research jquery', height: 80, day: '' }],
+          '2024-08-07': [{ name: 'cleaning', height: 80, day: '' }],
           // '2024-08-06': [],
-          '2024-08-05': [{ name: 'fishing' }, { name: 'go to hospital' }]
+          '2024-08-05': [{ name: 'fishing', height: 80, day: '' }, { name: 'go to hospital', height: 80, day: '' }]
         }}
         renderItem={(item: any) =>
           <View style={{
@@ -39,7 +40,7 @@ export default function TestAgenda() {
             <Text>{item.name}</Text>
           </View>
         }
-        renderEmptyData={(day: any) => (
+        renderEmptyData={() => (
           <View style={{
             width: '100%',
             padding: 20,
