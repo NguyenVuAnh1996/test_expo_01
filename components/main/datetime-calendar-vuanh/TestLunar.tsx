@@ -1,8 +1,16 @@
 import { Text } from "react-native";
-import getLunarDate from './lunarCalendar';
+import XDate from "xdate";
+
+const testXDate = (input: Date) => {
+  let _date = new XDate(input).clone();
+  for (let i = 0; i < 3; i++) {
+    _date.addDays(1);
+  }
+  return String(_date.getDate())
+}
 
 export default function TestLunar() {
   return (
-    <Text>{JSON.stringify(getLunarDate(25, 6, 2006))}</Text>
+    <Text>{testXDate(new Date())}</Text>
   )
 }
