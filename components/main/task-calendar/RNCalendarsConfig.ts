@@ -1,4 +1,5 @@
-import {LocaleConfig} from 'react-native-calendars';
+// import {LocaleConfig} from 'react-native-calendars';
+import XDate from 'xdate';
 
 interface MonthInfo {
   longName: string
@@ -114,13 +115,12 @@ export const daysOfWeek: DayOfWeekInfo[] = [
 ]
 
 export default function setUpRNCalendars() {
-  LocaleConfig.locales['vn'] = {
+  XDate.locales['vn'] = {
     monthNames: months.map(x => x.longName),
     monthNamesShort: months.map(x => x.shortName),
     dayNames: daysOfWeek.map(x => x.longName),
     dayNamesShort: daysOfWeek.map(x => x.shortName),
-    today: "Hôm nay",
   };
   
-  LocaleConfig.defaultLocale = 'vn';
+  XDate.defaultLocale = 'vn';
 }

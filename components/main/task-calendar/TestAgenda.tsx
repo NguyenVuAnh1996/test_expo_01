@@ -4,11 +4,6 @@ import { daysOfWeek } from "./RNCalendarsConfig";
 import { Agenda, AgendaEntry, AgendaSchedule } from "../react_native_calendars";
 import XDate from "xdate";
 
-interface TaskItemShown {
-  name: string
-
-}
-
 interface TaskItem {
   id: number
   name: string
@@ -18,7 +13,7 @@ interface TaskItem {
 }
 
 const taskList: TaskItem[] = [
-  // { id: 1, name: 'lorem ipsum 1', startTime: new Date(2024, 7, 12, 9, 10), endTime: new Date(2024, 7, 16, 10, 10), desc: 'asdf asdfkajsdlfja asdjfksdjf' },
+  { id: 1, name: 'lorem ipsum 1', startTime: new Date(2024, 7, 12, 9, 10), endTime: new Date(2024, 7, 16, 10, 10), desc: 'asdf asdfkajsdlfja asdjfksdjf' },
   { id: 2, name: 'lorem ipsum 2', startTime: new Date(2024, 7, 13, 23, 20), endTime: new Date(2024, 7, 14, 2, 15), desc: 'bgdf asdfkajsdlfja asdjfksdjf' },
   // { id: 3, name: 'lorem ipsum 3', startTime: new Date(2024, 7, 15, 8, 50), endTime: new Date(2024, 7, 22, 23, 10), desc: 'oop dfkajsdlfja asdjfksdjf' },
 ]
