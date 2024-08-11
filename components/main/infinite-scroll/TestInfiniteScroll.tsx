@@ -15,7 +15,7 @@ export default function TestInfiniteScroll() {
   const [noMoreData, setNoMoreData] = useState<boolean>(false);
 
   const getSomeJokes = useCallback(async (_page: number) => {
-    axios.get(`api/Joke?PageSize=${limit}&PageNumber=${_page}`)
+    axios.get(`api/jokes?pageSize=${limit}&pageNumber=${_page}`)
       .then(res => {
         let _newData: JokeEntity[] = res.data;
         if (_newData.length > 0) {

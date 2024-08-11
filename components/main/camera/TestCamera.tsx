@@ -83,7 +83,7 @@ export default function TestCamera() {
   }
 
   const handleUploadImage = async () => {
-    if (imgUri === '') return;
+    if (imgUri === '' || isUploading) return;
     startUploading(
       async () => {
         let formData = new FormData();
@@ -93,7 +93,7 @@ export default function TestCamera() {
           type: `image/${_fileType.slice(1)}`,
           uri: imgUri
         })
-        await axios.post('api/Image/upload', formData, {
+        await axios.post('api/photos/upload', formData, {
           headers: {
             'Accept': imageFileTypes.map(x => `image/${x}`).join(','),
             'Content-Type': 'multipart/form-data'
@@ -107,14 +107,14 @@ export default function TestCamera() {
           let errRes = err.response;
           console.log('vuanhErr:', errRes.data)
         } else {
-          console.log('there is no error response')
+          console.log('upload err: ', JSON.stringify(err))
         }
       }
     )
   }
 
   const tryGetAllImages = async () => {
-    const result = await axios.get('api/Image/');
+    const result = await axios.get('api/photos/');
     setImages(result.data);
     setImageListModalOpen(true);
     return result.data;
@@ -192,8 +192,11 @@ export default function TestCamera() {
         <Pressable style={styles.pickerBtn} onPress={pickImage}>
           <Text>Chọn từ thư mục</Text>
         </Pressable>
-        <Pressable disabled={isUploading} style={styles.uploadBtn} onPress={handleUploadImage}>
-          <Text>Upload</Text>
+        <Pressable disabled={isUploading} style={[
+          styles.uploadBtn,
+          { opacity: 0.7 }
+        ]} onPress={handleUploadImage}>
+          <Text>{isUploading ? '... uploading' : 'Upload'}</Text>
         </Pressable>
         <Pressable disabled={isGettingList} style={[
           styles.showImgListBtn,

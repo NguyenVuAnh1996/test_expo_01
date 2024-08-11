@@ -11,6 +11,8 @@ import { Colors } from "./constants/Colors";
 import Constants from 'expo-constants';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import setUpRNCalendars from "./components/main/task-calendar/RNCalendarsConfig";
+import { setGlobalProps } from "./lib/globalProps";
+import { useFonts } from "expo-font";
 
 axios.defaults.baseURL = backendHead;
 
@@ -23,6 +25,13 @@ setUpRNCalendars();
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [fontLoaded, fontErr] = useFonts({
+    'Inconsolata': require('@/assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf'),
+    'Roboto': 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'
+  });
+  if (!fontLoaded || fontErr) return <></>
+  setGlobalProps();
+  
   return (
     <NavigationContainer>
       <StatusBar backgroundColor={Colors.default.header} barStyle='dark-content' />

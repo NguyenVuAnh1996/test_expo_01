@@ -42,6 +42,12 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [".assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf"]
+        }
+      ],
       "expo-router",
       [
         "expo-local-authentication",
