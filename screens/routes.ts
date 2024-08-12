@@ -17,6 +17,7 @@ const routes: CompoundRoutes = {
   TestLocalAuth: { link: 'test-local-auth', displayName: 'Local authen' },
   InfiniteScroll: { link: 'infinite-scroll', displayName: 'Infinite scroll' },
   TestDate: { link: 'test-date', displayName: 'Test date' },
+  TestNoti: { link: 'test-noti', displayName: 'Test notification' },
 }
 
 export default routes;

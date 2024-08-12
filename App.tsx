@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import setUpRNCalendars from "./components/main/task-calendar/RNCalendarsConfig";
 import { setGlobalProps } from "./lib/globalProps";
 import { useFonts } from "expo-font";
+import notiLinkingConfig from "./lib/notiLinkingConfigs";
 
 axios.defaults.baseURL = backendHead;
 
@@ -33,7 +34,9 @@ export default function App() {
   setGlobalProps();
   
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      linking={notiLinkingConfig}
+    >
       <StatusBar backgroundColor={Colors.default.header} barStyle='dark-content' />
       {isIOS &&
         <View style={{

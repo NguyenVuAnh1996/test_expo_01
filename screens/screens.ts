@@ -4,6 +4,7 @@ import FormScreen from "./FormScreen"
 import InfiniteScrollScreen from "./InfiniteScrollScreen"
 import LocalAuthenScreen from "./LocalAuthenScreen"
 import LocationScreen from "./LocationScreen"
+import NotiScreen from "./NotiScreen"
 import PhotosScreen from "./PhotosScreen"
 import routes, { RouteDetails } from "./routes"
 import VideosScreen from "./VideosScreen"
@@ -20,6 +21,7 @@ const screens: {
     { details: routes.TestLocalAuth, component: LocalAuthenScreen },
     { details: routes.InfiniteScroll, component: InfiniteScrollScreen },
     { details: routes.TestDate, component: DateScreen },
+    { details: routes.TestNoti, component: NotiScreen },
   ];
 
 export default screens;
