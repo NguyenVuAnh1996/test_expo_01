@@ -16,14 +16,20 @@
       "supportsTablet": true
     },
     "androidStatusBar": {
-      "backgroundColor": "lightgreen",
+      "backgroundColor": "#90ee90",
       "translucent": false
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/react-logo@2x.png",
         "backgroundColor": "#ffffff"
       },
+      "splash": {
+        "image": "./assets/images/react-logo@3x.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT",
@@ -43,9 +49,17 @@
     },
     "plugins": [
       [
+        "expo-notifications",
+        {
+          "sounds": ["./assets/sounds/bike_bell.wav"]
+        }
+      ],
+      [
         "expo-font",
         {
-          "fonts": [".assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf"]
+          "fonts": [
+            "./assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf"
+          ]
         }
       ],
       "expo-router",
@@ -91,6 +105,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1e5b949f-aba7-4ea1-9c18-ad799b612d3d"
+      }
     }
   }
 }
