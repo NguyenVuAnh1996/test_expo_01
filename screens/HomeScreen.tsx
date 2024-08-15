@@ -29,7 +29,7 @@ const NavBtn = ({
 export default function HomeScreen({ navigation }: NativeStackScreenProps<any>) {
   return (
     <ScrollView style={{ flex: 1, padding: 10 }}>
-      {screens.toReversed().map(x => 
+      {screens.toReversed().filter(x => !x.homeExcluded).map(x => 
         <NavBtn 
           key={x.details.link}
           screenName={x.details.link}

@@ -51,6 +51,7 @@
       [
         "expo-notifications",
         {
+          "defaultChannel": "default",
           "sounds": ["./assets/sounds/bike_bell.wav"]
         }
       ],

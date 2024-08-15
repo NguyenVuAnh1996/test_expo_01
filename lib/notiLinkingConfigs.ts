@@ -56,5 +56,3 @@ const notiLinkingConfig: LinkingOptions<ReactNavigation.RootParamList> = {
 };
 
 export default notiLinkingConfig;
-
-// { "notification": { "request": { "trigger": { "seconds": 2, "channelId": "test_channel", "repeats": false, "type": "timeInterval" }, "content": { "vibrationPattern": [], "autoDismiss": true, "title": "Test noti title! 📬", "badge": null, "sticky": false, "sound": "custom", "body": "Test noti body", "subtitle": null }, "identifier": "2d04807c-4659-442c-ada3-c0b939fba002" }, "date": 1723447845625 }, "actionIdentifier": "expo.modules.notifications.actions.DEFAULT" }

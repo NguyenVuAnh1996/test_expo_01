@@ -7,21 +7,13 @@ import routes from '@/screens/routes';
 
 const redirectLink = 'myapp://' + routes.TestForm.link
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
 const schedulePushNotification = async () => {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "Test noti title!",
       body: 'Test noti body',
-      sound: "bike_bell.wav",
-      vibrate: [],
+      // sound: "bike_bell.wav",
+      // vibrate: [],
       data: {
         data: 'some data',
         test: { test1: 'some test data' },
@@ -30,7 +22,7 @@ const schedulePushNotification = async () => {
     },
     trigger: {
       seconds: 2,
-      channelId: 'test_channel_' + redirectLink,
+      channelId: 'default',
     },
     
   });
@@ -40,8 +32,8 @@ const registerForPushNotificationsAsync = async () => {
   let token;
 
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('test_channel_' + redirectLink, {
-      name: 'test_channel_' + redirectLink,
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FA8072',

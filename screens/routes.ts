@@ -18,6 +18,8 @@ const routes: CompoundRoutes = {
   InfiniteScroll: { link: 'infinite-scroll', displayName: 'Infinite scroll' },
   TestDate: { link: 'test-date', displayName: 'Test date' },
   TestNoti: { link: 'test-noti', displayName: 'Test notification' },
+  TestUser: { link: 'test-user', displayName: 'User' },
+  Login: { link: 'login', displayName: 'Login' },
 }
 
 export default routes;

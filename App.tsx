@@ -14,6 +14,7 @@ import setUpRNCalendars from "./components/main/task-calendar/RNCalendarsConfig"
 import { setGlobalProps } from "./lib/globalProps";
 import { useFonts } from "expo-font";
 import notiLinkingConfig from "./lib/notiLinkingConfigs";
+import * as Notifications from 'expo-notifications';
 
 axios.defaults.baseURL = backendHead;
 
@@ -22,6 +23,14 @@ const isIOS = Platform.OS === 'ios';
 const queryClient = new QueryClient()
 
 setUpRNCalendars();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Stack = createNativeStackNavigator();
 
