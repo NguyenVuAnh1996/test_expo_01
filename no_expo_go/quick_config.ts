@@ -1,1 +1,1 @@
-export const isUsingExpoGo = true;
+export const isUsingExpoGo = false;

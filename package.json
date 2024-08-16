@@ -71,8 +71,7 @@
     "react-native-ui-datepicker": "^2.0.3",
     "react-native-web": "~0.19.10",
     "react-native-weekly-calendar": "^0.2.0",
-    "xdate": "^0.8.3",
-    "expo-dev-client": "~4.0.23"
+    "xdate": "^0.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

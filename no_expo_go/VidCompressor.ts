@@ -1,5 +1,4 @@
 import { isUsingExpoGo } from './quick_config';
-// import { Video as VideoCompressor } from 'react-native-compressor';
 
 export class VidCompressor {
   constructor() { }

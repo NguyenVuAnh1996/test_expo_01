@@ -9,6 +9,8 @@ import { backendHead } from '@/constants/Others';
 import { useTryCatchPending } from '@/hooks/useTryCatchPending';
 import useQuerySimplified from '@/hooks/useQuerySimplified';
 import { useQuery } from '@tanstack/react-query';
+import * as FileSystem from 'expo-file-system';
+import ImageCompressor from '@/no_expo_go/ImageCompressor';
 
 const imageFileTypes = ['png', 'jpg', 'jpeg', 'heic'];
 
@@ -48,9 +50,27 @@ export default function TestCamera() {
   const [imgUri, setImgUri] = useState<string>('');
   const [images, setImages] = useState<ImageEntity[]>([]);
   const [imageListModalOpen, setImageListModalOpen] = useState<boolean>(false);
+  const [someInfo, setSomeInfo] = useState<string>('');
 
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
+  const compressImage = async (uriBefore: string): Promise<string> => {
+    let info = `file type before: ${getFileTypeFromUri(uriBefore)}\n`;
+    const fileInfo: any = await FileSystem.getInfoAsync(uriBefore, {
+      size: true
+    });
+    info += `file size before: ${fileInfo.size.toLocaleString()}\n`
+
+    const result = await ImageCompressor.compress(uriBefore);
+    info += `file type after: ${getFileTypeFromUri(result)}\n`;
+    const fileInfoAfter: any = await FileSystem.getInfoAsync(result, {
+      size: true
+    });
+    info += `file size after: ${fileInfoAfter.size.toLocaleString()}`
+    setSomeInfo(info);
+    return result;
   }
 
   const takePic = async () => {
@@ -59,13 +79,11 @@ export default function TestCamera() {
       async () => {
         const picture = await ref.current?.takePictureAsync();
         if (picture) {
-          let str = picture.uri;
-          let fileType = str.substring(str.lastIndexOf("."));
-          console.log('file type: ', fileType);
-          setImgUri(str);
+          let urlAfter = await compressImage(picture.uri)
+          setImgUri(urlAfter);
         }
       },
-      err => console.log('error when taking pic')
+      err => setSomeInfo('error when taking pic')
     )
   }
 
@@ -179,7 +197,7 @@ export default function TestCamera() {
                 uri: imgUri
               }}
             />
-            <Text>Image taken</Text>
+            <Text>{someInfo}</Text>
           </>
         }
       </View>
@@ -238,7 +256,10 @@ export default function TestCamera() {
                   objectFit: 'contain',
                   margin: 5
                 }}
-                src={`${backendHead}images/${x.url}`}
+                // src={`${backendHead}images/${x.url}`}
+                source={{
+                  uri: x.url
+                }}
               />
             )}
           </View>

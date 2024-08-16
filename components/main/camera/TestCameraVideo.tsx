@@ -41,22 +41,6 @@ const convertNowToFilename = () => {
   ].join('_');
 }
 
-const compressVideo = async (uriBefore: string): Promise<string> => {
-  console.log('file type before: ', getFileTypeFromUri(uriBefore));
-  const fileInfo: any = await FileSystem.getInfoAsync(uriBefore, {
-    size: true
-  });
-  console.log('file size before:', fileInfo.size.toLocaleString());
-
-  const result = await VidCompressor.compress(uriBefore);
-  console.log('file type after: ', result.substring(result.lastIndexOf(".")));
-  const fileInfoAfter: any = await FileSystem.getInfoAsync(result, {
-    size: true
-  });
-  console.log('file size after:', fileInfoAfter.size.toLocaleString());
-  return result;
-}
-
 const screenWidth = Dimensions.get("window").width;
 
 export default function TestCameraVideo() {
@@ -68,6 +52,8 @@ export default function TestCameraVideo() {
   const [isCameraReady, setCameraReady] = useState<boolean>(false);
   const [isRecording, executeRecording] = useTryCatchPending();
   const [isUploading, startUploading] = useTryCatchPending();
+  const [someInfo, setSomeInfo] = useState<string>('');
+
   const [isGettingList, startGettingList] = useTryCatchPending();
 
   const videoRef = useRef<Video>(null);
@@ -101,6 +87,23 @@ export default function TestCameraVideo() {
 
   const toggleCameraFacing = async () => {
     await setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
+  const compressVideo = async (uriBefore: string): Promise<string> => {
+    let info = `file type before: ${getFileTypeFromUri(uriBefore)}\n`;
+    const fileInfo: any = await FileSystem.getInfoAsync(uriBefore, {
+      size: true
+    });
+    info += `file size before: ${fileInfo.size.toLocaleString()}\n`
+
+    const result = await VidCompressor.compress(uriBefore);
+    info += `file type after: ${getFileTypeFromUri(result)}\n`;
+    const fileInfoAfter: any = await FileSystem.getInfoAsync(result, {
+      size: true
+    });
+    info += `file size after: ${fileInfoAfter.size.toLocaleString()}`
+    setSomeInfo(info);
+    return result;
   }
 
   const startRecording = async () => {
@@ -234,6 +237,7 @@ export default function TestCameraVideo() {
               useNativeControls
               ref={videoRef}
             />
+            <Text>{someInfo}</Text>
           </>
         }
       </View>

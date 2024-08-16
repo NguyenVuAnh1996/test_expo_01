@@ -13,8 +13,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import setUpRNCalendars from "./components/main/task-calendar/RNCalendarsConfig";
 import { setGlobalProps } from "./lib/globalProps";
 import { useFonts } from "expo-font";
-import notiLinkingConfig from "./lib/notiLinkingConfigs";
+import notiLinkingConfig from "./components/main/noti/notiLinkingConfigs";
 import * as Notifications from 'expo-notifications';
+import useInitialNoti from "./components/main/noti/useInitialNoti";
 
 axios.defaults.baseURL = backendHead;
 
@@ -35,6 +36,8 @@ Notifications.setNotificationHandler({
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [ notificationListener, responseListener ] = useInitialNoti();
+
   const [fontLoaded, fontErr] = useFonts({
     'Inconsolata': require('@/assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf'),
     'Roboto': 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'
